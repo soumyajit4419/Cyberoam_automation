@@ -38,9 +38,6 @@ function postRequest(usr, pwd, out) {
 }
 
 
-
-
-
 function main() {
 
     for (i = 1; i <= 97; i++) {
